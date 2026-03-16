@@ -17,6 +17,19 @@ if [[ ! -s "$code" ]]; then
   git add "$code"
 fi
 
-../../Data/quest $d 1
-../../Data/quest $d 2
-../../Data/quest $d 3
+input() {
+  part=$1
+  file="input/everybody_codes_e2025_q${dd}_p${part}.txt"
+  if [[ ! -f "$file" ]]; then
+    ../../Data/quest $d $part
+    cat $file
+    exit
+  fi
+}
+
+input 1
+input 2
+input 3
+#../../Data/quest $d 1
+#../../Data/quest $d 2
+#../../Data/quest $d 3
