@@ -19,9 +19,7 @@ object Quest07 {
 
     fun two(input: List<String>): Int {
         val (list, rules) = parse(input)
-        return list.mapIndexed { i, n ->
-            if (validName(n, rules)) i + 1 else 0
-        }.sum()
+        return list.mapIndexed { i, n -> if (validName(n, rules)) i + 1 else 0 }.sum()
     }
 
     fun three(input: List<String>): Int {
