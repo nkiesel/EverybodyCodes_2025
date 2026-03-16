@@ -5,17 +5,16 @@ object Quest05 {
     data class Spine(val c: Int) {
         var l: Int? = null
         var r: Int? = null
+
         fun add(n: Int): Boolean {
-            if (n < c && l == null) {
-                l = n
-                return true
-            } else if (n > c && r == null) {
-                r = n
-                return true
-            } else {
-                return false
+            when {
+                l == null && n < c -> l = n
+                r == null && n > c -> r = n
+                else -> return false
             }
+            return true
         }
+
         val number by lazy { ((l?.toString() ?: "") + c.toString() + (r?.toString() ?: "")).toLong() }
     }
 

@@ -49,33 +49,38 @@ object Quest01 {
 val Quest01Test by testSuite {
     val quest = "01"
 
-    val sample = """
-        Vyrdax,Drakzyph,Fyrryn,Elarzris
-
-        R3,L2,R3,L1
-    """.trimIndent().lines()
-
-    val sample3 = """
-        Vyrdax,Drakzyph,Fyrryn,Elarzris
-
-        R3,L2,R3,L3
-    """.trimIndent().lines()
-
     with(Quest01) {
         test("one") {
+            val sample = """
+                Vyrdax,Drakzyph,Fyrryn,Elarzris
+
+                R3,L2,R3,L1
+            """.trimIndent().lines()
             one(sample) shouldBe "Fyrryn"
+
             val input = lines(quest, 1)
             one(input) shouldBe "Ulkagrath"
         }
 
         test("two") {
+            val sample = """
+                Vyrdax,Drakzyph,Fyrryn,Elarzris
+
+                R3,L2,R3,L1
+            """.trimIndent().lines()
             two(sample) shouldBe "Elarzris"
             val input = lines(quest, 2)
             two(input) shouldBe "Wynnoris"
         }
 
         test("three") {
+            val sample3 = """
+                Vyrdax,Drakzyph,Fyrryn,Elarzris
+
+                R3,L2,R3,L3
+            """.trimIndent().lines()
             three(sample3) shouldBe "Drakzyph"
+
             val input = lines(quest, 3)
             three(input) shouldBe "Ulmarloris"
         }
