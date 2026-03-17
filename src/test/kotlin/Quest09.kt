@@ -4,34 +4,34 @@ import io.kotest.matchers.shouldBe
 object Quest09 {
     private fun parse(input: List<String>) = input.map { it.substringAfter(':') }
 
-    private fun isChild(c: String, p: List<String>): Boolean {
-        return c.withIndex().all { (i, c) -> c == p[0][i] || c == p[1][i] }
+    private fun isChild(child: String, parents: List<String>): Boolean {
+        return child.withIndex().all { (i, c) -> c == parents[0][i] || c == parents[1][i] }
     }
 
-    private fun similarity(c: String, parents: List<String>): Int {
-        return parents.map { c.zip(it).count { (a, b) -> a == b } }.product()
+    private fun similarity(child: String, parents: List<String>): Int {
+        return parents.map { child.zip(it).count { (a, b) -> a == b } }.product()
     }
 
     fun one(input: List<String>): Int {
         val dnas = parse(input)
-        val (i, c) = dnas.withIndex().first { (i, l) ->
-            isChild(l, dnas.filterIndexed { index, _ -> index != i })
+        val (i, child) = dnas.withIndex().first { (i, dna) ->
+            isChild(dna, dnas.filterIndexed { index, _ -> index != i })
         }
-        return similarity(c, dnas.filterIndexed { index, _ -> index != i })
+        return similarity(child, dnas.filterIndexed { index, _ -> index != i })
     }
 
     fun two(input: List<String>): Int {
         val dnas = parse(input)
         var result = 0
         for (i in dnas.indices) {
-            val c = dnas[i]
+            val child = dnas[i]
             for (j in dnas.indices) {
                 if (j == i) continue
                 for (k in j + 1 until dnas.size) {
                     if (k == i) continue
                     val parents = listOf(dnas[j], dnas[k])
-                    if (isChild(c, parents)) {
-                        result += similarity(c, parents)
+                    if (isChild(child, parents)) {
+                        result += similarity(child, parents)
                     }
                 }
             }
@@ -43,13 +43,13 @@ object Quest09 {
         val dnas = parse(input)
         var families = buildList {
             for (i in dnas.indices) {
-                val c = dnas[i]
+                val child = dnas[i]
                 for (j in dnas.indices) {
                     if (j == i) continue
                     for (k in j + 1 until dnas.size) {
                         if (k == i) continue
                         val parents = listOf(dnas[j], dnas[k])
-                        if (isChild(c, parents)) {
+                        if (isChild(child, parents)) {
                             add(setOf(i + 1, j + 1, k + 1))
                         }
                     }
