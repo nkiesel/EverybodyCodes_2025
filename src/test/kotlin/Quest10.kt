@@ -1,6 +1,5 @@
 import de.infix.testBalloon.framework.core.testSuite
 import io.kotest.matchers.shouldBe
-import java.nio.file.Files.move
 
 object Quest10 {
     private fun parse(input: List<String>) = CharArea(input)
@@ -8,7 +7,8 @@ object Quest10 {
     private fun move(start: Point, area: CharArea, prev: Set<Point> = emptySet()): Set<Point> =
         listOf(-2 to -1, -2 to 1, 2 to -1, 2 to 1, -1 to -2, -1 to 2, 1 to -2, 1 to 2)
             .map { (x, y) -> start.move(x, y) }
-            .filter { it !in prev && area.valid(it) }.toSet()
+            .filter { it !in prev && it in area }
+            .toSet()
 
     fun one(input: List<String>, rounds: Int = 4): Int {
         val area = parse(input)
@@ -41,12 +41,12 @@ object Quest10 {
             }
             sheep -= eaten
             result += eaten.size
-            sheep.forEach { sheep ->
-                val next = sheep.move(Direction.S)
+            sheep.forEach { current ->
+                val next = current.move(Direction.S)
                 if (next in pos && next !in hideouts) {
                     area[next] = '.'
                     result++
-                } else {
+                } else if (next in area) {
                     area[next] = 'S'
                 }
             }
