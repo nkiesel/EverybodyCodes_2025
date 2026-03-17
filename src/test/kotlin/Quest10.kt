@@ -29,25 +29,16 @@ object Quest10 {
         area[dragon] = '.'
         val hideouts = area.tiles('#').toSet()
         hideouts.forEach { area[it] = '.' }
+        var sheep = area.tiles('S').toSet()
         var pos = setOf(dragon)
         var result = 0
         repeat(rounds) {
             pos = pos.flatMap { move(it, area) }.toSet()
-            val sheep = area.tiles('S').toMutableSet()
-            val eaten = mutableSetOf<Point>()
-            sheep.forEach { sheep ->
-                area[sheep] = '.'
-                if (sheep in pos && sheep !in hideouts) eaten += sheep
-            }
-            sheep -= eaten
+            val eaten = sheep.filter { it in pos && it !in hideouts }.toSet()
             result += eaten.size
-            sheep.forEach { current ->
-                val next = current.move(Direction.S)
-                if (next in pos && next !in hideouts) {
-                    area[next] = '.'
-                    result++
-                } else if (next in area) {
-                    area[next] = 'S'
+            sheep = buildSet {
+                (sheep - eaten).map { it.move(Direction.S) }.forEach {
+                    if (it in pos && it !in hideouts) result++ else if (it in area) add(it)
                 }
             }
         }
