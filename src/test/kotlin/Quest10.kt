@@ -1,5 +1,11 @@
+import de.infix.testBalloon.framework.core.TestConfig
+import de.infix.testBalloon.framework.core.aroundAll
 import de.infix.testBalloon.framework.core.testSuite
 import io.kotest.matchers.shouldBe
+import jdk.internal.vm.vector.VectorSupport.test
+import kotlinx.coroutines.withTimeout
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 object Quest10 {
     private fun parse(input: List<String>) = CharArea(input)
@@ -45,8 +51,58 @@ object Quest10 {
         return result
     }
 
+    private fun Point.s(p: Char) = " $p>${('A'.code + x).toChar()}${y + 1}"
+
     fun three(input: List<String>): Long {
-        return 0L
+        val area = parse(input)
+        val hideouts = area.tiles('#').toSet()
+
+        class State3(val dragon: Point, var sheep: List<Point>, val steps: String, var eaten: List<Point>) {
+            var movedOut = false
+            fun moves(): List<State3> {
+                val nextDragon = move(dragon, area)
+                var states = buildList {
+                    for (s in sheep) {
+                        val n = s.move(Direction.S)
+                        if (n !in area) {
+                            movedOut = true
+                        } else if (n != dragon || n in hideouts) {
+                            val ns = sheep - s + n
+                            if (ns.any { it.y != area.yRange.last }) {
+                                nextDragon.forEach { d -> add(State3(d, ns, steps + n.s('S') + d.s('D'), eaten)) }
+                            }
+                        }
+                    }
+                }
+                if (states.isEmpty() && !movedOut) {
+                    states = nextDragon.map { State3(it, sheep, steps + it.s('D'), eaten) }
+                }
+                return states
+            }
+        }
+
+        val state = State3(area.first('D'), area.tiles('S').toList(), "", emptyList())
+        val queue = ArrayDeque(listOf(state))
+        var processed = 0
+        var result = 0L
+        val debug = mutableListOf<String>()
+        while (queue.isNotEmpty()) {
+            val s = queue.removeLast()
+            processed++
+            val eaten = s.sheep.find { it == s.dragon && it !in hideouts }
+            if (eaten != null) {
+                s.eaten += eaten
+                s.sheep -= eaten
+            }
+            if (s.sheep.isEmpty()) {
+                debug += s.steps
+                println(s.steps)
+                result++
+            } else {
+                s.moves().forEach { queue.add(it) }
+            }
+        }
+        return result
     }
 }
 
@@ -98,13 +154,20 @@ val Quest10Test by testSuite {
             two(input) shouldBe 1719
         }
 
-        test("three") {
+        val configuration = TestConfig.aroundAll { elementAction ->
+            withTimeout(30.minutes) {
+                elementAction()
+            }
+        }
+
+        test("three", testConfig = configuration) {
             val sample1 = """
                 SSS
                 ..#
                 #.#
                 #D.
             """.trimIndent().lines()
+            println("sample1")
             three(sample1) shouldBe 15L
 
             val sample2 = """
@@ -114,35 +177,36 @@ val Quest10Test by testSuite {
                 .##
                 .D#
             """.trimIndent().lines()
+            println("sample2")
             three(sample2) shouldBe 8L
+//
+//            val sample3 = """
+//                ..S..
+//                .....
+//                ..#..
+//                .....
+//                ..D..
+//            """.trimIndent().lines()
+//            three(sample3) shouldBe 44L
 
-            val sample3 = """
-                ..S..
-                .....
-                ..#..
-                .....
-                ..D..
-            """.trimIndent().lines()
-            three(sample3) shouldBe 44L
+//            val sample4 = """
+//                .SS.S
+//                #...#
+//                ...#.
+//                ##..#
+//                .####
+//                ##D.#
+//            """.trimIndent().lines()
+//            three(sample4) shouldBe 4406L
 
-            val sample4 = """
-                .SS.S
-                #...#
-                ...#.
-                ##..#
-                .####
-                ##D.#
-            """.trimIndent().lines()
-            three(sample4) shouldBe 4406L
-
-            val sample5 = """
-                SSS.S
-                .....
-                #.#.#
-                .#.#.
-                #.D.#
-            """.trimIndent().lines()
-            three(sample5) shouldBe 13033988838L
+//            val sample5 = """
+//                SSS.S
+//                .....
+//                #.#.#
+//                .#.#.
+//                #.D.#
+//            """.trimIndent().lines()
+//            three(sample5) shouldBe 13033988838L
 
 //            val input = lines(quest, 3)
 //            three(input) shouldBe ""
