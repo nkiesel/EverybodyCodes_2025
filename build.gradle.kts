@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotest)
     alias(libs.plugins.versions.update)
     alias(libs.plugins.testballon)
 }
@@ -41,8 +40,6 @@ kotlin {
     sourceSets {
         test {
             dependencies {
-                implementation(libs.kotest.framework.engine)
-                implementation(libs.kotest.runner.junit5)
                 implementation(libs.kotest.assertions.core)
                 implementation(libs.testballon.framework.core)
             }

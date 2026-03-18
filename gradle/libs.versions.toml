@@ -6,12 +6,9 @@ testballon = "0.8.4-K2.3.20"
 
 [libraries]
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
-kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
-kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 testballon-framework-core = { module = "de.infix.testBalloon:testBalloon-framework-core", version.ref = "testballon" }
 
 [plugins]
-kotest = { id = "io.kotest", version.ref = "kotest" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 testballon = { id = "de.infix.testBalloon", version.ref = "testballon" }
 versions-update = { id = "nl.littlerobots.version-catalog-update", version.ref = "plugin-versionsUpdate" }
