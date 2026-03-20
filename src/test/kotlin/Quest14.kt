@@ -11,16 +11,14 @@ object Quest14 {
             val next = area.clone()
             area.tiles().forEach { p ->
                 val c = area[p]
-                val n4 = area.neighbors8(p, '#').toSet() - area.neighbors4(p, '#').toSet()
-                val even = n4.size % 2 == 0
+                val even = (area.neighbors8(p, '#').toSet() - area.neighbors4(p, '#').toSet()).size % 2 == 0
                 next[p] = when (c) {
                     '#' -> if (even) '.' else '#'
                     else -> if (even) '#' else '.'
                 }
             }
             area = next
-            val count = area.tiles('#').count()
-            result += count
+            result += area.count('#')
         }
         return result
     }
@@ -63,7 +61,7 @@ object Quest14 {
             round++
             remaining--
             if (hasCenter) {
-                activeTiles += area.tiles('#').count()
+                activeTiles += area.count('#')
             }
             if (notJumped) {
                 val fp = fpa.joinToString("") { it.toString() }

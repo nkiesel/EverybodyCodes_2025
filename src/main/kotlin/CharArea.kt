@@ -163,6 +163,10 @@ class CharArea(private val area: Array<CharArray>) {
         }
     }
 
+    fun count(c: Char) = tiles(c).count()
+
+    fun count(condition: Condition? = null) = tiles(condition).count()
+
     fun manhattan(p: Point, max: Int, c: Char): Sequence<Point> = manhattan(p, max) { it == c }
 
     fun manhattan(p: Point, max: Int, condition: Condition? = null): Sequence<Point> = sequence {
