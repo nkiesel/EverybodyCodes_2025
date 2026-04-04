@@ -1,5 +1,6 @@
 import de.infix.testBalloon.framework.core.testSuite
 import io.kotest.matchers.shouldBe
+import kotlin.math.max
 
 object Quest19 {
     private fun parse(input: List<String>) = input.map { it.ints() }
@@ -48,16 +49,14 @@ object Quest19 {
     fun two(input: List<String>): Int {
         val data = parse(input)
         val maxY = data.maxOf { it[1] + it[2] + 2 }
-        val openings = mutableMapOf<Int, MutableSet<Int>>()
-        data.forEach { (x, y, r) ->
-            openings.getOrPut(x) { mutableSetOf() }.addAll((maxY - y - r)..<(maxY - y))
-        }
+        val openings = mutableMapOf<Int, Int>()
+        data.forEach { (x, y) -> openings[x] = max(maxY - y - 1, openings[x] ?: 0) }
         var ups = 0
         var x = 0
         var y = maxY
-        openings.entries.sortedBy { it.key }.forEach { (index, points) ->
+        openings.entries.sortedBy { it.key }.forEach { (index, m) ->
             do {
-                if (y > points.max()) {
+                if (y > m) {
                     y--
                     ups++
                 } else {
@@ -68,9 +67,7 @@ object Quest19 {
         return ups
     }
 
-    fun three(input: List<String>): Int {
-        return 0
-    }
+    fun three(input: List<String>) = two(input)
 }
 
 val Quest19Test by testSuite {
@@ -111,12 +108,8 @@ val Quest19Test by testSuite {
         }
 
         test("three") {
-            val sample = """
-            """.trimIndent().lines()
-            three(sample) shouldBe 0
-
-//            val input = lines(quest, 3)
-//            three(input) shouldBe 0
+            val input = lines(quest, 3)
+            three(input) shouldBe 4600289
         }
     }
 }
