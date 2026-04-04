@@ -1,6 +1,6 @@
 import de.infix.testBalloon.framework.core.testSuite
 import io.kotest.matchers.shouldBe
-import kotlin.math.max
+import kotlin.math.min
 
 object Quest19 {
     private fun parse(input: List<String>) = input.map { it.ints() }
@@ -46,28 +46,27 @@ object Quest19 {
         return ups
     }
 
-    fun two(input: List<String>): Int {
+    fun two(input: List<String>) = three(input)
+
+    fun three(input: List<String>): Int {
         val data = parse(input)
-        val maxY = data.maxOf { it[1] + it[2] + 2 }
         val openings = mutableMapOf<Int, Int>()
-        data.forEach { (x, y) -> openings[x] = max(maxY - y - 1, openings[x] ?: 0) }
+        data.forEach { (x, y) -> openings[x] = min(y, openings[x] ?: Int.MAX_VALUE) }
         var ups = 0
         var x = 0
-        var y = maxY
+        var y = 0
         openings.entries.sortedBy { it.key }.forEach { (index, m) ->
             do {
-                if (y > m) {
-                    y--
+                if (y <= m) {
+                    y++
                     ups++
                 } else {
-                    y++
+                    y--
                 }
             } while (++x < index)
         }
         return ups
     }
-
-    fun three(input: List<String>) = two(input)
 }
 
 val Quest19Test by testSuite {
@@ -87,7 +86,7 @@ val Quest19Test by testSuite {
 
             val input = lines(quest, 1)
             one(input) shouldBe 57
-            two(input) shouldBe 57
+            three(input) shouldBe 57
         }
 
         test("two") {
