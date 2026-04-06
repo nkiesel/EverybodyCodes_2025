@@ -67,46 +67,54 @@ object Quest20 {
         val areas = mutableListOf(first)
         areas += areas.last().turnRight()
         areas += areas.last().turnRight()
-        val connects = mutableListOf<MutableSet<Pair<Point, Point>>>()
+        val connects = mutableListOf<MutableMap<Point, MutableSet<Point>>>()
         val ends = mutableListOf<Point>()
-        areas.forEachIndexed { i, area ->
+        areas.forEach { area ->
             val end = area.first('E')
             ends += end
             area[end] = 'T'
-            val connect = mutableSetOf<Pair<Point, Point>>()
-            connects += connect
-            area.tiles().forEach { p ->
+            val connect = mutableMapOf<Point, MutableSet<Point>>()
+            area.tiles { it != '.' }.forEach { p ->
+                val pc = area[p]
                 val e = p.move(Direction.E)
-                if (area.getOrNull(e) == 'T') {
-                    connect.add(p to e)
-                }
-                if (area[p] == 'T') {
-                    connect.add(e to p)
+                val ec = area.getOrNull(e)
+                if (ec == '#' || ec == 'T') {
+                    if (ec == 'T') {
+                        connect.getOrPut(p) { mutableSetOf() }.add(e)
+                    }
+                    if (pc == 'T') {
+                        connect.getOrPut(e) { mutableSetOf() }.add(p)
+                    }
                 }
                 if (p.x % 2 != p.y % 2) {
                     val s = p.move(Direction.S)
-                    if (area.getOrNull(s) == 'T') {
-                        connect.add(p to s)
-                    }
-                    if (area[p] == 'T') {
-                        connect.add(s to p)
+                    val sc = area.getOrNull(s)
+                    if (sc == '#' || sc == 'T') {
+                        if (sc == 'T') {
+                            connect.getOrPut(p) { mutableSetOf() }.add(s)
+                        }
+                        if (pc == 'T') {
+                            connect.getOrPut(s) { mutableSetOf() }.add(p)
+                        }
                     }
                 }
             }
+            connects += connect
         }
-        val seen = mutableSetOf(start)
         val queue = ArrayDeque<IndexedValue<Point>>()
         queue.add(IndexedValue(0, start))
+        val seen = mutableSetOf< IndexedValue<Point>>()
         while (queue.isNotEmpty()) {
             val a = queue.removeFirst()
             if (a.value == ends[a.index % 3]) {
                 return a.index
             }
-            for (b in connects[(a.index) % 3].filter { it.first == a.value }.map { it.second }) {
-                if (seen.add(b)) {
-                    queue.add(IndexedValue(a.index + 1, b))
-                }
+            for (b in connects[(a.index) % 3][a.value] ?: emptyList()) {
+                val n = IndexedValue(a.index + 1, b)
+                if (seen.add(n)) queue.add(n)
             }
+            val n = IndexedValue(a.index + 1, a.value)
+            if (seen.add(n)) queue.add(n)
         }
         return 0
     }
