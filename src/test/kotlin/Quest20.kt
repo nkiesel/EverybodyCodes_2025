@@ -38,7 +38,7 @@ object Quest20 {
 
     fun two(input: List<String>): Int {
         val area = parse(input)
-        val connects = mutableSetOf<Pair<Point, Point>>()
+        val connects = mutableMapOf<Point, MutableSet<Point>>()
         val start = area.first('S')
         val end = area.first('E')
         area[start] = 'T'
@@ -46,18 +46,18 @@ object Quest20 {
         area.tiles('T').forEach { p ->
             val e = p.move(Direction.E)
             if (area.getOrNull(e) == 'T') {
-                connects.add(p to e)
-                connects.add(e to p)
+                connects.getOrPut(p) { mutableSetOf() }.add(e)
+                connects.getOrPut(e) { mutableSetOf() }.add(p)
             }
             if (p.x % 2 != p.y % 2) {
                 val s = p.move(Direction.S)
                 if (area.getOrNull(s) == 'T') {
-                    connects.add(p to s)
-                    connects.add(s to p)
+                    connects.getOrPut(p) { mutableSetOf() }.add(s)
+                    connects.getOrPut(s) { mutableSetOf() }.add(p)
                 }
             }
         }
-        return bfs(start) { p -> connects.filter { it.first == p }.map { it.second } }.first { it.value == end }.index
+        return bfs(start) { p -> connects[p]!! }.first { it.value == end }.index
     }
 
     fun three(input: List<String>): Int {
@@ -178,12 +178,6 @@ val Quest20Test by testSuite {
         }
 
         test("three") {
-//            val a = CharArea("""
-//                12345
-//                .678.
-//                ..9..
-//            """.trimIndent())
-//            val b = a.turnRight()
             val sample = """
                 T####T#TTT##T##T#T#
                 .T#####TTTT##TTT##.
