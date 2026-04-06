@@ -23,8 +23,8 @@ object Quest20 {
         var sx = 0
         fun valid() = nx in xRange && ny in yRange && ax in xRange && ay in yRange && this[ax, ay] != '.'
         do {
-            next[nx--, ny] = this[ax++,ay]
-            if (valid()) next[nx--, ny] = this[ax,ay++]
+            next[nx--, ny] = this[ax++, ay]
+            if (valid()) next[nx--, ny] = this[ax, ay++]
             if (!valid()) {
                 ny++
                 nx = next.xRange.last - ny
@@ -75,40 +75,40 @@ object Quest20 {
             area[end] = 'T'
             val connect = mutableSetOf<Pair<Point, Point>>()
             connects += connect
-            area.tiles('T').forEach { p ->
+            area.tiles().forEach { p ->
                 val e = p.move(Direction.E)
                 if (area.getOrNull(e) == 'T') {
                     connect.add(p to e)
+                }
+                if (area[p] == 'T') {
                     connect.add(e to p)
                 }
                 if (p.x % 2 != p.y % 2) {
                     val s = p.move(Direction.S)
                     if (area.getOrNull(s) == 'T') {
                         connect.add(p to s)
+                    }
+                    if (area[p] == 'T') {
                         connect.add(s to p)
                     }
                 }
             }
         }
-        return sequence {
-            val seen = mutableSetOf(start)
-            val queue = ArrayDeque<IndexedValue<Point>>()
-            queue.add(IndexedValue(0, start))
-            while (queue.isNotEmpty()) {
-                val a = queue.removeFirst()
-                yield(a)
-                for (b in connects[a.index % 3].filter { it.first == a.value }.map { it.second }) {
-                    if (seen.add(b)) {
-                        queue.add(IndexedValue(a.index + 1, b))
-                    }
+        val seen = mutableSetOf(start)
+        val queue = ArrayDeque<IndexedValue<Point>>()
+        queue.add(IndexedValue(0, start))
+        while (queue.isNotEmpty()) {
+            val a = queue.removeFirst()
+            if (a.value == ends[a.index % 3]) {
+                return a.index
+            }
+            for (b in connects[(a.index) % 3].filter { it.first == a.value }.map { it.second }) {
+                if (seen.add(b)) {
+                    queue.add(IndexedValue(a.index + 1, b))
                 }
             }
-        }.first {
-            if (it.index == 23) {
-                println(it)
-            }
-            it.value == ends[it.index % 3]
-        }.index
+        }
+        return 0
     }
 }
 
