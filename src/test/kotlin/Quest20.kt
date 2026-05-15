@@ -101,15 +101,17 @@ object Quest20 {
             }
             connects += connect
         }
+
         val queue = ArrayDeque<IndexedValue<Point>>()
         queue.add(IndexedValue(0, start))
-        val seen = mutableSetOf< IndexedValue<Point>>()
+        val seen = mutableSetOf<IndexedValue<Point>>()
         while (queue.isNotEmpty()) {
             val a = queue.removeFirst()
-            if (a.value == ends[a.index % 3]) {
+            val i = a.index % 3
+            if (a.value == ends[i]) {
                 return a.index
             }
-            for (b in connects[(a.index) % 3][a.value] ?: emptyList()) {
+            for (b in connects[i][a.value] ?: emptyList()) {
                 val n = IndexedValue(a.index + 1, b)
                 if (seen.add(n)) queue.add(n)
             }
